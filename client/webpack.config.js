@@ -52,7 +52,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       title: "Puzzle Bop",
-      template: path.resolve(__dirname, "src/index.html")
+      template: path.resolve(__dirname, "public/index.html")
     }),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
