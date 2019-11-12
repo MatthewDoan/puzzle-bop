@@ -10,18 +10,33 @@ export class TetrisScene extends Phaser.Scene {
   board = createTetrisBoard()
 
   rotateLeftKey?: Phaser.Input.Keyboard.Key
+
+  rotateRightKey?: Phaser.Input.Keyboard.Key
+
+  moveLeftKey?: Phaser.Input.Keyboard.Key
+
+  moveRightKey?: Phaser.Input.Keyboard.Key
   
+  rotateLeftFlipFlop: boolean = false
+
+  rotateRightFlipFlop: boolean = false
+
+  moveLeftFlipFlop = false
+
+  moveRightFlipFlop = false
 
   constructor() {
     super({})
-    this.tetromino = new Tetromino(TetrominoShape.O)
+    this.tetromino = new Tetromino(TetrominoShape.J)
   }
 
   preload() {}
 
   create() {
     this.rotateLeftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z)
-    
+    this.rotateRightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X)
+    this.moveLeftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT)
+    this.moveRightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT)
 
     const gridX = 500
     const gridY = 500
@@ -57,8 +72,8 @@ export class TetrisScene extends Phaser.Scene {
     color: number
   ) {
     const rect = this.add.rectangle(
-      gridX - cellSize * 5 + cellSize / 2 + (x * cellSize),
-      gridY - cellSize * 10 + cellSize / 2 + (y * cellSize),
+      (x * cellSize) + (cellSize / 2),
+      (y * cellSize) + (cellSize / 2),
       cellSize,
       cellSize,
       color
@@ -68,7 +83,7 @@ export class TetrisScene extends Phaser.Scene {
   }
 
   drawTetromino() {
-    let tetrominoCells: Phaser.GameObjects.GameObject[] = []
+    let tetrominoCells: Phaser.GameObjects.Rectangle[] = []
     if (this.tetromino) {
       this.tetromino.matrix.forEach((row, rowIndex) => {
         row.forEach((num, colIndex) => {
@@ -77,21 +92,71 @@ export class TetrisScene extends Phaser.Scene {
           }
         })
       })
+
+      tetrominoCells.forEach(cell =>  {
+        cell.x -= this.tetromino!.matrix.length * 20 / 2
+        cell.y -= this.tetromino!.matrix.length * 20 / 2
+      })
     }
-    return this.add.container(500, 500, tetrominoCells)
+    const container = this.add.container(300 + 10, 300 + 10, tetrominoCells)
+    // 
+    return container
   }
 
   update() {
     if (this.tetrominoContainer) {
-      if (this.tetrominoContainer.y < 500 + 20 * 20)
-        this.tetrominoContainer.y += 1
+      if (this.tetrominoContainer.y < 700 - 10)
+        this.tetrominoContainer.y += 0.5   
+        
     }
 
+    this.handleInput()
+  }
+
+  handleInput() {
     if (this.rotateLeftKey && this.tetromino && this.tetrominoContainer) {
-      if (this.rotateLeftKey.isDown) {
+      if (this.rotateLeftKey.isDown && !this.rotateLeftFlipFlop) {
         this.tetromino.rotateLeft([])
-        this.tetrominoContainer.destroy()
-        this.tetrominoContainer = this.drawTetromino()
+        this.tetrominoContainer.angle += 90
+        this.rotateLeftFlipFlop = true
+      }
+
+      if(this.rotateLeftKey.isUp) {
+        this.rotateLeftFlipFlop = false
+      }
+    }
+
+    if (this.rotateRightKey && this.tetromino && this.tetrominoContainer) { 
+      if (this.rotateRightKey.isDown && !this.rotateRightFlipFlop) {
+        this.tetromino.rotateLeft([])
+        this.tetrominoContainer.angle += 90
+        this.rotateRightFlipFlop = true
+      }
+
+      if (this.rotateRightKey.isUp) {
+        this.rotateRightFlipFlop = false
+      }
+    }
+
+    if (this.moveRightKey && this.tetromino && this.tetrominoContainer) {
+      if (this.moveRightKey.isDown && !this.moveRightFlipFlop) {
+        this.tetrominoContainer.x += 20
+        this.moveRightFlipFlop = true
+      }
+
+      if(this.moveRightKey.isUp) {
+        this.moveRightFlipFlop = false
+      }
+    }
+
+    if (this.moveLeftKey && this.tetromino && this.tetrominoContainer) {
+      if (this.moveLeftKey.isDown && !this.moveLeftFlipFlop) {
+        this.tetrominoContainer.x -= 20
+        this.moveLeftFlipFlop = true
+      }
+
+      if(this.moveLeftKey.isUp) {
+        this.moveLeftFlipFlop = false
       }
     }
   }

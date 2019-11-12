@@ -1,5 +1,6 @@
 export enum TetrominoShape {
-  I = 1,
+  EMPTY = 0,
+  I,
   J,
   L,
   O,

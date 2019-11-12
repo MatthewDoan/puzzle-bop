@@ -11,6 +11,8 @@ export class Tetromino {
     y: number
   }
 
+  fastFalling = false
+
   constructor(shape: TetrominoShape) {
     this.shape = shape
     this.matrix = createTetrominoMatrix(shape)
